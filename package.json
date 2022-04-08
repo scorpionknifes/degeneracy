@@ -3,12 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@pixiv/three-vrm": "^0.6.10",
+    "@react-three/fiber": "^8.0.10",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
+    "buffer": "^6.0.3",
+    "mmd-parser": "^1.0.4",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "5.0.0",
+    "three": "^0.139.2",
+    "vmd.js": "^1.0.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

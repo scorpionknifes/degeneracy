@@ -1,24 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import { Canvas } from "@react-three/fiber";
+import { Suspense } from "react";
+import styles from "./App.module.css";
+import { Controls } from "./Controls";
+import { VRMViewer } from "./VRMViewer";
+import * as THREE from "three";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main className={styles.main}>
+      <Canvas
+        camera={{ position: [0, 1.5, 4], fov: 30, near: 0.001, far: 100 }}
+      >
+        <Suspense fallback={null}>
+          <directionalLight />
+          <VRMViewer />
+          <Controls
+            target={new THREE.Vector3(0, 1, 0)}
+            maxDistance={10}
+            screenSpacePanning
+          />
+          <gridHelper />
+          <axesHelper />
+        </Suspense>
+      </Canvas>
+    </main>
   );
 }
 
