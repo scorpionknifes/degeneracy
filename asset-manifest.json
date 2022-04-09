@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/degeneracy/static/css/main.0ee6b407.css",
+    "main.js": "/degeneracy/static/js/main.acda0c6c.js",
+    "static/media/ExampleAvatar_B.vrm": "/degeneracy/static/media/ExampleAvatar_B.7187a06ae08fea521ef3.vrm",
+    "static/media/music_wavefile_short.mp3": "/degeneracy/static/media/music_wavefile_short.fbeb37e02ece56542db9.mp3",
+    "static/media/wavefile_v2.vmd": "/degeneracy/static/media/wavefile_v2.745b642fcee6a4344136.vmd",
+    "index.html": "/degeneracy/index.html",
+    "main.0ee6b407.css.map": "/degeneracy/static/css/main.0ee6b407.css.map",
+    "main.acda0c6c.js.map": "/degeneracy/static/js/main.acda0c6c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0ee6b407.css",
+    "static/js/main.acda0c6c.js"
+  ]
+}
