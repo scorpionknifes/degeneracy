@@ -10,7 +10,6 @@ const VRMViewer = ({ vrm, ikRef, mixerRef, clockRef }) => {
     }
 
     const delta = clockRef.current.getDelta();
-    console.log(delta);
 
     if (mixerRef.current) {
       mixerRef.current.update(delta);
@@ -21,7 +20,6 @@ const VRMViewer = ({ vrm, ikRef, mixerRef, clockRef }) => {
     }
 
     if (vrm) {
-      console.log(vrm);
       vrm.update(delta);
     }
 

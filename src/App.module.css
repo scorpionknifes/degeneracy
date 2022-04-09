@@ -1,8 +1,8 @@
 .main {
   font-family: sans-serif;
   text-align: center;
-  height: 100vh;
-  width: 100vw;
+  height: calc(100vh - 33px);
+  width: calc(100vw - 8px);
 }
 
 .overlay {
@@ -10,9 +10,4 @@
   width: 100%;
   height: 100%;
   z-index: 2;
-}
-
-body {
-  padding: 0;
-  margin: 0;
 }

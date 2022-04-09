@@ -7,7 +7,7 @@ import * as THREE from "three";
 import { useVrm } from "./useVrm";
 import ExampleAvatar from "./assets/ExampleAvatar_B.vrm";
 import { convert, getVmd } from "./vmdUtils";
-import { AnimationMixer, Clock } from "three";
+import { AnimationMixer, Clock, LoopOnce } from "three";
 import { bindToVRM, toOffset } from "./vmdBinding";
 import VRMIKHandler from "./vrmIKHandler";
 import danceFile from "./assets/wavefile_v2.vmd";
@@ -30,7 +30,10 @@ function App() {
 
     const clip = bindToVRM(animation, vrm);
     mixerRef.current = new AnimationMixer(vrm.scene);
-    mixerRef.current.clipAction(clip).play();
+    const animate = mixerRef.current.clipAction(clip);
+    animate.setLoop(LoopOnce);
+    animate.clampWhenFinished = true;
+    animate.play();
     ikRef.current = VRMIKHandler.get(vrm);
 
     await new Promise((resolve) => setTimeout(resolve, (160 / 30) * 1000));
@@ -64,7 +67,6 @@ function App() {
           <gridHelper />
         </Suspense>
       </Canvas>
-      )
     </main>
   );
 }
