@@ -8,6 +8,7 @@ Hosted on [GitHub Pages](https://zhenk.dev/degeneracy/)
 
 ### Resources used:
 
+[vrm-helper](https://www.npmjs.com/package/vrm-helper)<br>
 [Three.JS](https://github.com/mrdoob/three.js)<br>
 [@react-three/fiber](https://docs.pmnd.rs/react-three-fiber/getting-started/introduction)<br>
 [@pixiv/three-vrm](https://github.com/pixiv/three-vrm)<br>
