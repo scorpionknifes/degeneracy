@@ -6,9 +6,11 @@ import {
 } from "three";
 import { IKHandler } from "vrm-helper";
 
+// bindToVRM returns a new AnimationClip with the given animation and vrm.
 export const bindToVRM = (data, vrm) => {
   const tracks = [];
   for (const { type, name, isIK, times, values } of data.timelines) {
+    // get the srcName for timeline
     let srcName;
     switch (type) {
       case "morph": {
@@ -34,6 +36,8 @@ export const bindToVRM = (data, vrm) => {
       default:
         continue;
     }
+
+    // add timeline to tracks based on type
     switch (type) {
       case "morph":
         tracks.push(new NumberKeyframeTrack(srcName, times, values));

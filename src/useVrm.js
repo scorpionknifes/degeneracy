@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VRM, VRMUtils } from "@pixiv/three-vrm";
 
+// useVrm hook returns a promise that resolves to a VRM object.
 const useVrm = (url) => {
   const { current: loader } = useRef(new GLTFLoader());
   const [vrm, setVrm] = useState();

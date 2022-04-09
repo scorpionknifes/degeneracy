@@ -4,6 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 extend({ OrbitControls });
 
+// Controls is a react component wrapper for OrbitControls
 const Controls = (props) => {
   const {
     camera,

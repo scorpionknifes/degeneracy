@@ -1,18 +1,20 @@
-import { Canvas } from "@react-three/fiber";
 import { Suspense, useRef, useState } from "react";
+import { Canvas } from "@react-three/fiber";
+import { toOffset, IKHandler, convert } from "vrm-helper";
+import { Parser } from "mmd-parser";
 import * as THREE from "three";
-import { AnimationMixer, Clock, LoopOnce } from "three";
+
 import styles from "./App.module.css";
 import { Controls } from "./Controls";
 import { VRMViewer } from "./VRMViewer";
 import { useVrm } from "./useVrm";
 import { bindToVRM } from "./vmdBinding";
-import { toOffset, IKHandler, convert } from "vrm-helper";
-import ExampleAvatar from "./assets/ExampleAvatar_B.vrm";
-import danceFile from "./assets/wavefile_v2.vmd";
-import music from "./assets/music_wavefile_short.mp3";
-import { Parser } from "mmd-parser";
 
+import ExampleAvatar from "./assets/ExampleAvatar_B.vrm"; // vtuber model
+import danceFile from "./assets/wavefile_v2.vmd"; // vocaloid motion data (vmd) for miku dance
+import music from "./assets/music_wavefile_short.mp3"; // mp3 audio file for miku dance
+
+// getVmd returns a promise that resolves to a VMD object.
 const getVmd = async (url) => {
   const data = await fetch(url)
     .then((res) => res.blob())
@@ -33,19 +35,24 @@ function App() {
   const start = async () => {
     setShow(false);
     const vmd = await getVmd(danceFile);
-    clockRef.current = new Clock();
 
+    // reset Clock to zero
+    clockRef.current = new THREE.Clock();
+
+    // convert animation to AnimationClip
     const animation = convert(vmd, toOffset(vrm));
-
     const clip = bindToVRM(animation, vrm);
-    mixerRef.current = new AnimationMixer(vrm.scene);
 
-    const animate = mixerRef.current.clipAction(clip);
-    animate.setLoop(LoopOnce);
-    animate.clampWhenFinished = true;
-    animate.play();
+    // setup mixer and ik handler
+    mixerRef.current = new THREE.AnimationMixer(vrm.scene);
     ikRef.current = IKHandler.get(vrm);
 
+    const animate = mixerRef.current.clipAction(clip);
+    animate.setLoop(THREE.LoopOnce);
+    animate.clampWhenFinished = true; // don't reset pos after animation ends
+    animate.play(); // play animation
+
+    // play audio (sets delay to sync with motion)
     await new Promise((resolve) => setTimeout(resolve, (160 / 30) * 1000));
     audio.play();
     audio.volume = 0.01;
