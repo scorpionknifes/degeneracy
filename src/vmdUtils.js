@@ -1,4 +1,3 @@
-import danceData from "./assets/dance.vmd";
 import { Parser } from "mmd-parser";
 import { VRMSchema } from "@pixiv/three-vrm";
 import { MathUtils, Quaternion, Vector3 } from "three";
@@ -163,16 +162,16 @@ const VMD_VRM_MORTH_MAP = new Map([
 ]);
 
 const IK_OFFSET_INIT = new Map([
-  [VMDBoneNames.Center, { x: 0, y: 1, z: 0, s: 10 }],
-  [VMDBoneNames.LeftFootIK, { x: 1, y: 1, z: 0, s: 10, dx: true }],
-  [VMDBoneNames.RightFootIK, { x: -1, y: 1, z: 0, s: 10, dx: true }],
+  [VMDBoneNames.Center, { x: 0, y: 1, z: 0, s: 11 }],
+  [VMDBoneNames.LeftFootIK, { x: 1, y: 1, z: 0, s: 11, dx: false }],
+  [VMDBoneNames.RightFootIK, { x: -1, y: 1, z: 0, s: 11, dx: false }],
   [
     VMDBoneNames.LeftToeIK,
-    { x: 0, y: -1, z: -1, s: 10, oy: 4, dx: true, dz: true },
+    { x: 0, y: -1, z: -1, s: 11, oy: 4, dx: false, dz: false },
   ],
   [
     VMDBoneNames.RightToeIK,
-    { x: 0, y: -1, z: -1, s: 10, oy: 4, dx: true, dz: true },
+    { x: 0, y: -1, z: -1, s: 11, oy: 4, dx: false, dz: false },
   ],
 ]);
 
@@ -200,7 +199,6 @@ VMD_BONE_NAMES.add(VMDBoneNames.Root);
 VMD_BONE_NAMES.add(VMDBoneNames.Center);
 
 const convert = (vmd, vrmOffset) => {
-  console.log(vmd);
   const morphs = convertMorphs(vmd);
   const motions = convertMotions(vmd, vrmOffset);
 
@@ -211,7 +209,6 @@ const convert = (vmd, vrmOffset) => {
 };
 
 const convertMorphs = ({ morphs }) => {
-  console.log("morphs", morphs);
   sortFrames(morphs);
   const timelines = new Map();
   for (const { morphName, weight, frameNum } of morphs) {
@@ -542,8 +539,8 @@ const mergeTimelines = (tlsMap, ...tlsKey) => {
 const resolveTimeline = (map) => (key) =>
   Array.isArray(key) ? key : map.get(key);
 
-const getVmd = async () => {
-  const data = await fetch(danceData)
+const getVmd = async (url) => {
+  const data = await fetch(url)
     .then((res) => res.blob())
     .then((blob) => blob.arrayBuffer());
   const vmdData = new Parser().parseVmd(data);
@@ -551,7 +548,6 @@ const getVmd = async () => {
 };
 
 const sortFrames = (f) => {
-  console.log(f);
   return (Array.isArray(f) ? f : Array.from(f)).sort(
     (a, b) => a.frameNum - b.frameNum
   );

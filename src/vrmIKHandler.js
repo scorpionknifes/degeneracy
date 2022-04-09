@@ -69,36 +69,6 @@ const linkPos = new Vector3();
 const linkScale = new Vector3();
 const axis = new Vector3();
 
-const clampVector3ByRadian = (v, min, max) => {
-  return v.set(
-    clampByRadian(v.x, min?.x, max?.x),
-    clampByRadian(v.y, min?.y, max?.y),
-    clampByRadian(v.z, min?.z, max?.z)
-  );
-};
-
-const PI2 = Math.PI * 2;
-
-const clampByRadian = (
-  v,
-  min = Number.NEGATIVE_INFINITY,
-  max = Number.POSITIVE_INFINITY
-) => {
-  const hasMin = Number.isFinite(min);
-  const hasMax = Number.isFinite(max);
-  if (hasMin && hasMax && min === max) return min;
-  if (hasMin) min = MathUtils.euclideanModulo(min, PI2);
-  if (hasMax) max = MathUtils.euclideanModulo(max, PI2);
-  v = MathUtils.euclideanModulo(v, PI2);
-  if (hasMin && hasMax && min >= max) {
-    max += PI2;
-    if (v < Math.PI) v += PI2;
-  }
-  if (hasMax && v > max) v = max;
-  else if (hasMin && v < min) v = min;
-  return MathUtils.euclideanModulo(v, PI2);
-};
-
 export default class VRMIKHandler {
   static cache = new WeakMap();
 
@@ -113,11 +83,11 @@ export default class VRMIKHandler {
 
   targets = new Map();
   iks = new Map();
+  vector = new Vector3();
   bones;
   root;
 
   constructor(model) {
-    console.log(model);
     const { humanoid } = model;
     if (!humanoid) throw new Error("VRM does not contains humanoid");
     this.bones = boneNameOrder.map(humanoid.getBoneNode, humanoid);
@@ -128,10 +98,10 @@ export default class VRMIKHandler {
       effector: leftFootId,
       target: leftFootId,
       iteration: 40,
-      maxAngle: 0.5,
+      maxAngle: 2,
       links: [
         {
-          enabled: false,
+          enabled: true,
           index: boneMap.get(BoneNames.LeftLowerLeg),
           rotationMin: new Vector3(-180, 0, 0).multiplyScalar(
             MathUtils.DEG2RAD
@@ -139,7 +109,7 @@ export default class VRMIKHandler {
           rotationMax: new Vector3(0, 0, 0),
         },
         {
-          enabled: false,
+          enabled: true,
           index: boneMap.get(BoneNames.LeftUpperLeg),
         },
       ],
@@ -149,10 +119,10 @@ export default class VRMIKHandler {
       effector: rightFootId,
       target: rightFootId,
       iteration: 40,
-      maxAngle: 0.5,
+      maxAngle: 2,
       links: [
         {
-          enabled: false,
+          enabled: true,
           index: boneMap.get(BoneNames.RightLowerLeg),
           rotationMin: new Vector3(-180, 0, 0).multiplyScalar(
             MathUtils.DEG2RAD
@@ -160,7 +130,7 @@ export default class VRMIKHandler {
           rotationMax: new Vector3(0, 0, 0),
         },
         {
-          enabled: false,
+          enabled: true,
           index: boneMap.get(BoneNames.RightUpperLeg),
         },
       ],
@@ -170,7 +140,7 @@ export default class VRMIKHandler {
       effector: leftToeId,
       target: leftToeId,
       iteration: 3,
-      maxAngle: 1,
+      maxAngle: 4,
       links: [
         {
           enabled: false,
@@ -183,7 +153,7 @@ export default class VRMIKHandler {
       effector: rightToeId,
       target: rightToeId,
       iteration: 3,
-      maxAngle: 1,
+      maxAngle: 4,
       links: [
         {
           enabled: false,
@@ -222,37 +192,67 @@ export default class VRMIKHandler {
       const effector = this.bones[ik.effector];
       const target = this.targets.get(ik.target);
       if (!effector || !target) continue;
+
+      // don't use getWorldPosition() here for the performance
+      // because it calls updateMatrixWorld( true ) inside.
       targetPos.setFromMatrixPosition(target.matrixWorld);
+
       const iteration = ik.iteration ?? 1;
       for (let j = 0; j < iteration; j++) {
         let rotated = false;
         for (const { enabled, index, rotationMin, rotationMax } of ik.links) {
           if (!enabled) break;
           const link = this.bones[index];
+
+          // don't use getWorldPosition/Quaternion() here for the performance
+          // because they call updateMatrixWorld( true ) inside.
           link.matrixWorld.decompose(linkPos, quaternion, linkScale);
           quaternion.invert();
           effectorPos.setFromMatrixPosition(effector.matrixWorld);
+
+          // work in link world
           effectorVec
             .subVectors(effectorPos, linkPos)
             .applyQuaternion(quaternion)
             .normalize();
+
           targetVec
             .subVectors(targetPos, linkPos)
             .applyQuaternion(quaternion)
             .normalize();
+
           let angle = targetVec.dot(effectorVec);
+
           if (angle > 1) angle = 1;
           else if (angle < -1) angle = -1;
+
           angle = Math.acos(angle);
+
           if (angle < 1e-5) continue;
-          if (ik.minAngle != null && angle < ik.minAngle) angle = ik.minAngle;
-          if (ik.maxAngle != null && angle > ik.maxAngle) angle = ik.maxAngle;
+
+          if (ik.minAngle && angle < ik.minAngle) angle = ik.minAngle;
+          if (ik.maxAngle && angle > ik.maxAngle) angle = ik.maxAngle;
+
           axis.crossVectors(effectorVec, targetVec).normalize();
+
           link.quaternion.multiply(quaternion.setFromAxisAngle(axis, angle));
-          clampVector3ByRadian(link.rotation, rotationMin, rotationMax);
+
+          if (rotationMin) {
+            link.rotation.setFromVector3(
+              this.vector.setFromEuler(link.rotation).max(rotationMin)
+            );
+          }
+
+          if (rotationMax) {
+            link.rotation.setFromVector3(
+              this.vector.setFromEuler(link.rotation).min(rotationMax)
+            );
+          }
           link.updateMatrixWorld(true);
+
           rotated = true;
         }
+
         if (!rotated) break;
       }
     }

@@ -1,50 +1,32 @@
-import { useVrm } from "./useVrm";
-import ExampleAvatar from "./assets/ExampleAvatar_B.vrm";
-import { convert, getVmd } from "./vmdUtils";
-import { useEffect, useMemo, useRef } from "react";
-import { AnimationMixer, Clock } from "three";
-import { useFrame } from "@react-three/fiber";
-import { bindToVRM, toOffset } from "./vmdBinding";
-import VRMIKHandler from "./vrmIK";
+import { useFrame, useThree } from "@react-three/fiber";
 
-const VRMViewer = () => {
-  const { vrm } = useVrm(ExampleAvatar);
+const VRMViewer = ({ vrm, ikRef, mixerRef, clockRef }) => {
+  const { camera } = useThree();
 
-  const ik = useRef(null);
-
-  const mixer = useMemo(
-    () => (vrm ? new AnimationMixer(vrm.scene) : undefined),
-    [vrm]
-  );
-
-  useEffect(() => {
-    const vmd = async () => {
-      const vmd = await getVmd();
-
-      const animation = convert(vmd, toOffset(vrm));
-      console.log(animation);
-
-      const clip = bindToVRM(animation, vrm);
-      mixer.clipAction(clip).play();
-      ik.current = VRMIKHandler.get(vrm);
-    };
-
-    if (vrm) {
-      vmd();
-    }
-  }, [mixer, vrm]);
-
-  useFrame((_, delta) => {
-    if (mixer) {
-      mixer.update(delta);
+  // Look at camera
+  useFrame(() => {
+    if (!clockRef.current) {
+      return;
     }
 
-    if (ik.current) {
-      ik.current.update();
+    const delta = clockRef.current.getDelta();
+    console.log(delta);
+
+    if (mixerRef.current) {
+      mixerRef.current.update(delta);
+    }
+
+    if (ikRef.current) {
+      ikRef.current.update();
     }
 
     if (vrm) {
+      console.log(vrm);
       vrm.update(delta);
+    }
+
+    if (vrm && vrm.lookAt) {
+      vrm.lookAt.target = camera;
     }
   });
 

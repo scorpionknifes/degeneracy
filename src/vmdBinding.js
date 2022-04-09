@@ -6,7 +6,7 @@ import {
   Vector3,
 } from "three";
 import { VRMSchema } from "@pixiv/three-vrm";
-import VRMIKHandler from "./vrmIK";
+import VRMIKHandler from "./vrmIKHandler";
 
 export function toOffset(vrm) {
   const { humanoid } = vrm;
