@@ -7,20 +7,16 @@ const useVrm = (url) => {
   const [vrm, setVrm] = useState();
 
   useEffect(() => {
-    const loadVrm = (url) => {
-      loader.load(url, async (gltf) => {
-        VRMUtils.removeUnnecessaryJoints(gltf.scene);
-        VRMUtils.removeUnnecessaryVertices(gltf.scene);
+    if (!url) return;
 
-        const vrm = await VRM.from(gltf);
-        vrm.scene.rotation.y = Math.PI;
-        setVrm(vrm);
-      });
-    };
+    loader.load(url, async (gltf) => {
+      VRMUtils.removeUnnecessaryJoints(gltf.scene);
+      VRMUtils.removeUnnecessaryVertices(gltf.scene);
 
-    if (url) {
-      loadVrm(url);
-    }
+      const vrm = await VRM.from(gltf);
+      vrm.scene.rotation.y = Math.PI;
+      setVrm(vrm);
+    });
   }, [loader, url]);
 
   return { vrm };
