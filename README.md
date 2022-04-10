@@ -5,9 +5,13 @@ What is [**three-vrm**](https://pixiv.github.io/three-vrm/packages/three-vrm/doc
 The following is a demonstration video for using **three-vrm** with **React.js**, **Three.js**, **@react-three/fiber**.
 The demonstration is also hosted on [**GitHub Pages**](https://zhenk.dev/degeneracy/)
 
+[**_Original Repo_**](https://github.com/scorpionknifes/degeneracy) or
+[_GitHub Classroom_](https://github.com/UOA-CS732-SE750-Students-2022/assignment-01-scorpionknifes)
+
 ### **Video**:
 
 [![Video](https://img.youtube.com/vi/0zQFiaGZxHg/0.jpg)](https://www.youtube.com/watch?v=0zQFiaGZxHg)
+
 [Youtube Link](https://www.youtube.com/watch?v=0zQFiaGZxHg)
 
 ### **Resources used**:
